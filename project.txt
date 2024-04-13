@@ -6,6 +6,17 @@
     "dy":40,
     "fontSize":22,
   },
+    "params":[
+      {
+          "name": "measure",
+          "value": "Finale",
+          "bind": {
+            "input": "select",
+            "options": ["Finale", "Premier", "Reunion", "Mean"],
+            "name": "Viewership Type"
+          }
+        }
+  ],
   "hconcat": [
       {
     "data": {
@@ -45,7 +56,7 @@
         "toggle": true,
         "fields": ["location"]
       }
-    }
+    },
   ],
     "mark": {
       "type": "point",
@@ -72,10 +83,11 @@
       },
       "size": {
         "condition": {"param":"location_selection","value":40},
-        "value":15
+        "value":25
       }
     }
     },
+    
     { 
       "mark": {"type": "text", "align": "left", "x": 10, "fontSize":12},
       "encoding": {
@@ -113,6 +125,7 @@
         }
       },
       {
+        
         "data": {
           "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
           "format": {
@@ -121,7 +134,9 @@
         },
         "params": [
           {"name": "location_selection", "select": {"type": "point", "fields": ["location"], "toggle":true}},
-          {"name": "only_location_selection", "select": {"type": "point", "fields": ["location"], "toggle":true}}
+          {"name": "only_location_selection", "select": {"type": "point", "fields": ["location"], "toggle":true}},
+          // {"name": "season_selection","select": {"type":"interval",
+          // "fields": ["season"]}}
         ],
         "projection": {
           "type": "equalEarth"
@@ -137,12 +152,7 @@
             "type": "quantitative"
           },
           "size": {
-            // "condition": {
-            //   "param": "location_selection",
-            //   "value": 40
-            // },
-            // "value": 20
-            "field": "location",
+            "field": "season",
             "type": "nominal",
             "aggregate":"count",
             "scale": {
@@ -169,7 +179,7 @@
             "value": 1
           },
           "tooltip": [
-          {"field": "location", "type": "nominal", "title": "Location"}
+            {"field": "location", "type": "nominal", "title": "Location"}
           ]
         }
       }
@@ -181,16 +191,13 @@
     "layer": [
       {
         
-        "transform": [
-          {
-            "filter": {
-              "field":"season",
-              "lte":40
-            }
-          }
-        ],
+        // "transform": [
+        //   {
+        //     "filter": {"param": "location_selection"}
+        //   }
+        // ],
         "data": {
-              "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways.csv",
+              "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways2.csv",
               "format": {
                 "type": "csv"
               }
@@ -209,7 +216,7 @@
               //   "nice":false
               //  },
               "title": "Age While Playing",
-              "scale": {"domain": [18, 75]},
+              //"scale": {"domain": [18, 75]},
               "titleFontSize":12
             },
             "y": {
@@ -228,7 +235,7 @@
             "filter": {
               "field":"season",
               "lte":40
-            }
+            },
           }
         ],
         "data": {
@@ -365,7 +372,7 @@
     "resolve": {"scale": {"y": "independent"},
     "legend":{"size":"shared"}},
   }
-  ]
+  ],
   },
   {
     "width":200,
@@ -383,7 +390,7 @@
           "type": "point", 
           "toggle": true,
           "fields": ["location", "season"]
-        },
+        }
       },
         {
           "name":"only_location_selection",
@@ -392,7 +399,17 @@
             "toggle": true,
             "fields": ["location"]
           }
-        }
+        },
+    ],
+    "transform":[
+      {
+      "calculate": "datum[measure]",
+      "as": "y_diff"
+      },
+      {
+        "calculate": "'Viewers (Millions)'",
+        "as": "smart_viewer_title"
+      }
     ],
       "mark": "bar",
       "encoding": {
@@ -409,11 +426,10 @@
         }
         },
         "x": {
-          "field": "viewers_finale",
+          "field": "y_diff",
           "type": "quantitative",
           "axis":{
-            "title":"Finale Viewers (Millions)",
-            "titleFontSize":12
+            "title":"Viewers (Millions)"
           }
         },
         "color":{
