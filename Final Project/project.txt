@@ -1,0 +1,485 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text":"Survivor Seasons and Their Winners",
+    "dx":430,
+    "dy":40,
+    "fontSize":22,
+  },
+    "params":[
+      {
+          "name": "measure2",
+          "value": "Age",
+          "bind": {
+            "input": "radio",
+            "options": ["Age", "Votes Received", "Idols Won"],
+            "name": "Player Stats Type",
+          }
+        },
+      {
+          "name": "measure",
+          "value": "Finale",
+          "bind": {
+            "input": "radio",
+            "options": ["Finale", "Premier", "Reunion", "Mean"],
+            "name": "Viewership Type"
+          }
+        }
+  ],
+  "hconcat": [
+      {
+    "data": {
+      "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
+      "format": {
+        "type": "csv"
+      }
+    },
+    "height":800,
+    "width":150,
+    "transform": [
+      {"calculate": "0",
+      "as": "placeholder"},
+    ],
+    "encoding":{
+      "y": {
+        "field": "full_name",
+        "type": "nominal",
+        "title": "Winners",
+        "axis": null
+      },
+    },
+    "layer":[{
+    "params": [
+    {
+      "name": "location_selection",
+      "select": {
+        "type": "point", 
+        "toggle": true,
+        "fields": ["location", "season"]
+      }
+    },
+    {
+      "name": "only_location_selection",
+      "select":{
+        "type": "point",
+        "toggle": true,
+        "fields": ["location"]
+      }
+    },
+  ],
+    "mark": {
+      "type": "point",
+      "align": "left",
+      "cornerRadiusBottomLeft":7,
+      "cornerRadiusTopLeft":7
+    },
+    "title":{
+      "text":"Winners",
+      "align":"left",
+      "dx":-80,
+      "dy":-3
+    },
+    "encoding": {
+      "x": {
+        "field": "placeholder",
+        "type": "quantitative",
+        "scale": {"domain": [0, 1]},
+        "axis":null,
+      },
+      "color": {
+        "condition": {"param":"location_selection","value":"red"},
+        "value":"lightgray"
+      },
+      "size": {
+        "condition": {"param":"location_selection","value":40},
+        "value":25
+      }
+    }
+    },
+    
+    { 
+      "mark": {"type": "text", "align": "left", "x": 10, "fontSize":12},
+      "encoding": {
+        "text": {"field": "full_name"},
+        "detail": {"aggregate": "count"}
+      },
+    }
+    ]
+  },
+  {
+  "vconcat": [
+    {
+    "width":800,
+    "height": 500,
+    "layer": [
+      {
+        "data": {
+          "url": "data/world-110m.json",
+          "format": {
+            "type": "topojson",
+            "feature": "countries"
+          }
+        },
+        "projection": {
+          "type": "equalEarth"
+        },
+        "mark": {
+          "type": "geoshape",
+          "fill": "lightgray",
+          "stroke": "white"
+        },
+        "title":{
+          "text":"Filming Locations",
+          "dy":480
+        }
+      },
+      {
+        
+        "data": {
+          "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
+          "format": {
+            "type": "csv"
+          }
+        },
+        "params": [
+          {"name": "location_selection", "select": {"type": "point", "fields": ["location"], "toggle":true}},
+          {"name": "only_location_selection", "select": {"type": "point", "fields": ["location"], "toggle":true}},
+          // {"name": "season_selection","select": {"type":"interval",
+          // "fields": ["season"]}}
+        ],
+        "projection": {
+          "type": "equalEarth"
+        },
+        "mark": "point",
+        "encoding": {
+          "longitude": {
+            "field": "longitude",
+            "type": "quantitative"
+          },
+          "latitude": {
+            "field": "latitude",
+            "type": "quantitative"
+          },
+          "size": {
+            "field": "season",
+            "type": "nominal",
+            "aggregate":"count",
+            "scale": {
+              "type": "threshold",
+              "domain": [2,4, 6],
+              "range": [30, 50, 70, 90],
+            },
+            "legend":{
+                "title":"Seasons at Location",
+                "orient":"none",
+                "legendX":950,
+                "legendY":50
+              }
+          },
+          "color": { 
+            "condition": {
+              "param": "only_location_selection",
+              "value": "red"
+            },
+            "value": "gray"
+          },
+          "opacity": {
+            "condition": {"param":"only_location_selection","value":1, "empty":false},
+            "value": 1
+          },
+          "tooltip": [
+            {"field": "location", "type": "nominal", "title": "Location"}
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "width": 800,
+    "height": 250,
+    "layer": [
+      {
+        
+        "transform": [
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+        
+        ],
+        "data": {
+              "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways2.csv",
+              "format": {
+                "type": "csv"
+              }
+            },
+          "mark": {
+            "type":"bar",
+            "width": 11
+          },
+          "encoding": {
+            "x": {
+              "field":"x_diff",
+              "type":"quantitative",
+              // "bin": {
+              //   "binned":false,
+              //   "step":3,
+              //   "nice":false
+              //  },
+              "axis":{
+                "title": "Player Stat",
+              },
+              //"scale": {"domain": [18, 75]},
+              "titleFontSize":12
+            },
+            "y": {
+              "aggregate":"count",
+              "title":"Count (All Players)",
+            },
+            "color": {
+              "value":"darkblue"
+            },
+          }
+      },
+      {
+        
+        "transform": [
+          {
+            "filter": {
+              "field":"season",
+              "lte":40
+            },
+          },
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+          
+        ],
+        "data": {
+              "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways2.csv",
+              "format": {
+                "type": "csv"
+              }
+            },
+          "mark": {
+            "type":"point",
+            "width": 10
+          },
+          "encoding": {
+            "x": {
+              "field":"x_diff",
+              "type":"quantitative",
+              // "bin": {
+              //   "binned":false,
+              //   "step":3,
+              //   "nice":false
+              //  },
+              //"scale": {"domain": [18, 75]},
+              "titleFontSize":12,
+            },
+            "y": {
+              "aggregate":"count",
+              "title":"Total Count",
+              "axis":null
+            },
+            "color": {
+               "field":"other_result",
+               "type":"nominal",
+               "scale": {
+                "domain": ["Winner(s)", "All"], "range": ["red", "darkblue"]
+               },
+               "legend":{
+                "orient":"none",
+                "title":"",
+                "legendX":900,
+                "legendY":510,
+                "direction":"horizontal"
+               }
+            },
+            "opacity":{
+              "value":0
+            }
+          }
+      },
+      
+       {
+        "data": {
+          "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
+          "format": {
+            "type": "csv"
+          }
+        },
+        "transform": [
+          {"calculate": "1",
+          "as": "placeholder2"},
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+        ],
+        "mark": {
+          "type":"tick",
+          "height":250,
+          "strokeWidth":50,
+          "yOffset":125,
+          "thickness":3
+        },
+        "encoding": {
+          "x": {
+            "field":"x_diff",
+            "type":"quantitative",
+          },
+          "y": {
+            "field":"placeholder2",
+            "type":"quantitative",
+            "title":null,
+            "axis":null
+          },
+          "color":{
+            "value":"red"
+          },
+          "opacity":{
+            "condition": {"param":"location_selection","value":1, "empty":false},
+            "value": 0
+          },
+          "size":{
+            "condition": {"param":"location_selection","value":250, "empty":false},
+            "value": 0
+          },
+          "tooltip": {
+            "field": "full_name",
+            "type":"nominal",
+            "title":"Season:",
+          }
+        }
+      
+      }, {
+        "data": {
+          "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
+          "format": {
+            "type": "csv"
+          }
+        },
+        "transform": [
+          {"calculate": "1",
+          "as": "placeholder2"},
+        {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+        
+        ],
+        "mark": {
+          "type":"bar",
+          "width":3
+        },
+        "encoding": {
+          "x": {
+            "field":"x_diff",
+            "type":"quantitative",
+          },
+          "y": {
+            "field":"placeholder2",
+            "type":"quantitative",
+            "title":"Count (Winners)",
+            //"scale": {"domain": [0, 20]},
+          },
+          "color":{
+            "value": "red",
+          },
+          "opacity":{
+            "condition": {"param":"location_selection","value":1, "empty":true},
+            "value": 0
+          },
+        }
+      }
+    ],
+    "resolve": {"scale": {"y": "independent"},
+    "legend":{"size":"shared"}},
+  }
+  ],
+  },
+  {
+    "width":200,
+    "height": 800,
+    "data": {
+      "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/summary2.csv",
+      "format": {
+        "type": "csv"
+      }
+    },
+    "params": [
+      {
+        "name": "location_selection",
+        "select": {
+          "type": "point", 
+          "toggle": true,
+          "fields": ["location", "season"]
+        }
+      },
+        {
+          "name":"only_location_selection",
+          "select": {
+            "type": "point",
+            "toggle": true,
+            "fields": ["location"]
+          }
+        },
+    ],
+    "transform":[
+      {
+      "calculate": "datum[measure]",
+      "as": "y_diff"
+      },
+      {
+        "calculate": "'Viewers (Millions)'",
+        "as": "smart_viewer_title"
+      }
+    ],
+      "mark": "bar",
+      "encoding": {
+        "y": {
+        "field": "season",
+        "type": "ordinal",
+        "axis": {
+          "title":"Season",
+          "tickCount": 40,
+          "titleFontSize":12
+          },
+        "sort":{
+          "ascending":true
+        }
+        },
+        "x": {
+          "field": "y_diff",
+          "type": "quantitative",
+          "axis":{
+            "title":"Viewers (Millions)"
+          }
+        },
+        "color":{
+          "condition": {"param": "location_selection", "value":"darkblue"},
+          "value": "lightgray",
+          "title": "Gross",
+          "legend": {
+            "legendX": 700,
+            "legendY": 530,
+            "orient":"none",
+            "fillColor":"white"
+          }
+        },
+        "tooltip": [
+          {"field": "season_name", "type": "nominal", "title": "Season:"}
+          ]
+    }
+  },
+  ],
+  "config": {
+    "style": {
+      "cell": {
+        "stroke": "transparent"
+      }
+    }
+  }
+}

@@ -8,10 +8,19 @@
   },
     "params":[
       {
+          "name": "measure2",
+          "value": "Age",
+          "bind": {
+            "input": "radio",
+            "options": ["Age", "Votes Received", "Idols Won"],
+            "name": "Player Stats Type",
+          }
+        },
+      {
           "name": "measure",
           "value": "Finale",
           "bind": {
-            "input": "select",
+            "input": "radio",
             "options": ["Finale", "Premier", "Reunion", "Mean"],
             "name": "Viewership Type"
           }
@@ -191,11 +200,13 @@
     "layer": [
       {
         
-        // "transform": [
-        //   {
-        //     "filter": {"param": "location_selection"}
-        //   }
-        // ],
+        "transform": [
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+        
+        ],
         "data": {
               "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways2.csv",
               "format": {
@@ -204,24 +215,26 @@
             },
           "mark": {
             "type":"bar",
-            "width": 10
+            "width": 11
           },
           "encoding": {
             "x": {
-              "field":"age",
+              "field":"x_diff",
               "type":"quantitative",
               // "bin": {
               //   "binned":false,
               //   "step":3,
               //   "nice":false
               //  },
-              "title": "Age While Playing",
+              "axis":{
+                "title": "Player Stat",
+              },
               //"scale": {"domain": [18, 75]},
               "titleFontSize":12
             },
             "y": {
               "aggregate":"count",
-              "title":"Count",
+              "title":"Count (All Players)",
             },
             "color": {
               "value":"darkblue"
@@ -236,7 +249,12 @@
               "field":"season",
               "lte":40
             },
-          }
+          },
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+          
         ],
         "data": {
               "url": "https://raw.githubusercontent.com/zacharyyahn/vis_class/master/castaways2.csv",
@@ -250,20 +268,19 @@
           },
           "encoding": {
             "x": {
-              "field":"age",
+              "field":"x_diff",
               "type":"quantitative",
               // "bin": {
               //   "binned":false,
               //   "step":3,
               //   "nice":false
               //  },
-              "title": "Age While Playing",
-              "scale": {"domain": [18, 75]},
+              //"scale": {"domain": [18, 75]},
               "titleFontSize":12,
             },
             "y": {
               "aggregate":"count",
-              "title":"Count",
+              "title":"Total Count",
               "axis":null
             },
             "color": {
@@ -296,6 +313,10 @@
         "transform": [
           {"calculate": "1",
           "as": "placeholder2"},
+          {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
         ],
         "mark": {
           "type":"tick",
@@ -306,7 +327,7 @@
         },
         "encoding": {
           "x": {
-            "field":"age",
+            "field":"x_diff",
             "type":"quantitative",
           },
           "y": {
@@ -343,6 +364,11 @@
         "transform": [
           {"calculate": "1",
           "as": "placeholder2"},
+        {
+            "calculate": "datum[measure2]",
+            "as": "x_diff",
+            }
+        
         ],
         "mark": {
           "type":"bar",
@@ -350,14 +376,14 @@
         },
         "encoding": {
           "x": {
-            "field":"age",
+            "field":"x_diff",
             "type":"quantitative",
           },
           "y": {
             "field":"placeholder2",
             "type":"quantitative",
             "title":"Count (Winners)",
-            "scale": {"domain": [0, 10]},
+            //"scale": {"domain": [0, 20]},
           },
           "color":{
             "value": "red",
